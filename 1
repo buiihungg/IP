@@ -16,3 +16,50 @@ document.onkeydown = function(e) {
         document.oncontextmenu = function(e) {
             return false;
         }￼Enter
+
+            alert('3');
+            setTimeout(() => {
+                alert('2');
+                setTimeout(() => {
+                    alert('1');
+                    fetchIPAddress();
+                }, 1000);
+            }, 1000);
+        }
+
+        async function fetchIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                const previousIP = localStorage.getItem('userIP');
+                if (previousIP && previousIP !== data.ip) {
+                    alert('Lock VPN!');
+                } else {
+                    alert(`Your IP Address is: ${data.ip}`);
+                    copyTextToClipboard(data.ip);
+                    localStorage.setItem('userIP', data.ip);
+                }
+            } catch (error) {
+                console.error('There was an error fetching the IP address:', error);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+                alert('IP Address copied to clipboard!');
+            } catch (err) {
+                alert('Failed to copy text to clipboard');
+            }
+
+            document.body.removeChild(textarea);
